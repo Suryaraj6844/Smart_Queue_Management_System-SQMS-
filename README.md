@@ -1,2 +1,3 @@
-# Smart_Queue_Management_System-SQMS-
-A full-stack web application for efficient queue management, enabling users to book tokens online, track live queue status, and reduce waiting time.
+# Smart Queue Management System
+
+This is a full-stack web application developed as part of our internship project.
