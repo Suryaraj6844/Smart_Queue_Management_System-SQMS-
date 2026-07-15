@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const generateToken = require("../utils/generateToken");
 
 const registerUserService = async (userData) => {
     const { fullName, email, password } = userData;
@@ -34,6 +35,43 @@ const registerUserService = async (userData) => {
     };
 };
 
+const loginUserService = async (userData) => {
+    const { email, password } = userData;
+
+    // Check required fields
+    if (!email || !password) {
+        throw new Error("Please provide email and password");
+    }
+
+    // Find user
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        throw new Error("Invalid email or password");
+    }
+
+    // Compare password
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+        throw new Error("Invalid email or password");
+    }
+
+    // Generate JWT
+    const token = generateToken(user);
+
+    return {
+        token,
+        user: {
+            id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            role: user.role,
+        },
+    };
+};
+
 module.exports = {
     registerUserService,
+    loginUserService,
 };
