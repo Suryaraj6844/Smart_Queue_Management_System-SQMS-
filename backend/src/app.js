@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const authRoutes = require("./routes/authRoutes");
 const queueRoutes = require("./routes/queueRoutes");
 const queueEntryRoutes = require("./routes/queueEntryRoutes");
+const adminQueueRoutes = require("./routes/adminQueueRoutes");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/queues", queueRoutes);
 app.use("/api/queues", queueEntryRoutes);
+app.use("/api/admin", adminQueueRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
