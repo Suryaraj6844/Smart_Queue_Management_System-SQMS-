@@ -64,7 +64,106 @@ const completeStudentService = async (queueId) => {
     };
 };
 
+const getDashboardStatsService = async () => {
+    const totalQueues = await Queue.countDocuments();
+
+    const activeQueues = await Queue.countDocuments({
+        status: "open",
+    });
+
+    const waitingStudents = await QueueEntry.countDocuments({
+        status: "waiting",
+    });
+
+    const servingStudents = await QueueEntry.countDocuments({
+        status: "serving",
+    });
+
+    const completedStudents = await QueueEntry.countDocuments({
+        status: "completed",
+    });
+
+    const cancelledStudents = await QueueEntry.countDocuments({
+        status: "cancelled",
+    });
+
+    return {
+        totalQueues,
+        activeQueues,
+        waitingStudents,
+        servingStudents,
+        completedStudents,
+        cancelledStudents,
+    };
+};
+ 
+// Pause Queue
+const pauseQueueService = async (queueId) => {
+    const queue = await Queue.findById(queueId);
+
+    if (!queue) {
+        throw new Error("Queue not found");
+    }
+
+    if (queue.status === "paused") {
+        throw new Error("Queue is already paused");
+    }
+
+    if (queue.status === "closed") {
+        throw new Error("Closed queue cannot be paused");
+    }
+
+    queue.status = "paused";
+    await queue.save();
+
+    return queue;
+};
+
+// Resume Queue
+const resumeQueueService = async (queueId) => {
+    const queue = await Queue.findById(queueId);
+
+    if (!queue) {
+        throw new Error("Queue not found");
+    }
+
+    if (queue.status === "open") {
+        throw new Error("Queue is already open");
+    }
+
+    if (queue.status === "closed") {
+        throw new Error("Closed queue cannot be resumed");
+    }
+
+    queue.status = "open";
+    await queue.save();
+
+    return queue;
+};
+
+// Close Queue
+const closeQueueService = async (queueId) => {
+    const queue = await Queue.findById(queueId);
+
+    if (!queue) {
+        throw new Error("Queue not found");
+    }
+
+    if (queue.status === "closed") {
+        throw new Error("Queue is already closed");
+    }
+
+    queue.status = "closed";
+    await queue.save();
+
+    return queue;
+};
+
 module.exports = {
     callNextStudentService,
     completeStudentService,
+    getDashboardStatsService,
+    pauseQueueService,
+    resumeQueueService,
+    closeQueueService,
 };

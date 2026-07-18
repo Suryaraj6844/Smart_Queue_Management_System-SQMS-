@@ -14,11 +14,11 @@ const queueSchema = new mongoose.Schema(
             trim: true,
         },
 
-        status: {
-            type: String,
-            enum: ["open", "closed"],
-            default: "open",
-        },
+    status: {
+        type: String,
+        enum: ["open", "paused", "closed"],
+        default: "open",
+    },
 
         averageServiceTime: {
             type: Number,

@@ -8,22 +8,22 @@ const adminOnly = require("../middleware/adminMiddleware");
 const {
     callNextStudent,
     completeStudent,
+    getDashboardStats,
+    pauseQueue,
+    resumeQueue,
+    closeQueue,
 } = require("../controllers/adminQueueController");
 
-// Call next student
-router.post(
-    "/queues/:queueId/call-next",
-    protect,
-    adminOnly,
-    callNextStudent
-);
+router.get("/dashboard", protect, adminOnly, getDashboardStats);
 
-// Complete current student
-router.post(
-    "/queues/:queueId/complete",
-    protect,
-    adminOnly,
-    completeStudent
-);
+router.post("/queues/:queueId/call-next", protect, adminOnly, callNextStudent);
+
+router.post("/queues/:queueId/complete", protect, adminOnly, completeStudent);
+
+router.post("/queues/:queueId/pause", protect, adminOnly, pauseQueue);
+
+router.post("/queues/:queueId/resume", protect, adminOnly, resumeQueue);
+
+router.post("/queues/:queueId/close", protect, adminOnly, closeQueue);
 
 module.exports = router;
