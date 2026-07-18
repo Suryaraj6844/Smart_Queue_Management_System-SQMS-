@@ -9,6 +9,23 @@ const joinQueueService = async (queueId, userId) => {
         throw new Error("Queue not found");
     }
 
+    // ==============================
+    // Business Rule #1
+    // Queue must be open
+    // ==============================
+
+    if (queue.status === "paused") {
+        throw new Error(
+            "Queue is paused. You cannot join at the moment."
+        );
+    }
+
+    if (queue.status === "closed") {
+        throw new Error(
+            "Queue is closed. You cannot join."
+        );
+    }
+
     // Check if user is already in the queue
     const existingEntry = await QueueEntry.findOne({
         queue: queueId,
@@ -69,19 +86,19 @@ const getQueueStatusService = async (queueId, userId) => {
         user: userId,
     }).sort({ joinedAt: -1 });
 
-if (!queueEntry) {
-    throw new Error("You have never joined this queue.");
-}
+    if (!queueEntry) {
+        throw new Error("You have never joined this queue.");
+    }
 
-// If service is completed
-if (queueEntry.status === "completed") {
-    return {
-        queueName: queue.queueName,
-        tokenNumber: queueEntry.tokenNumber,
-        status: "completed",
-        message: "Your service has been completed.",
-    };
-}
+    // If service is completed
+    if (queueEntry.status === "completed") {
+        return {
+            queueName: queue.queueName,
+            tokenNumber: queueEntry.tokenNumber,
+            status: "completed",
+            message: "Your service has been completed.",
+        };
+    }
 
     // If queue was cancelled
     if (queueEntry.status === "cancelled") {
