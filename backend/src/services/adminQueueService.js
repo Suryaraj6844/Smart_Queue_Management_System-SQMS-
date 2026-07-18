@@ -1,12 +1,27 @@
 const Queue = require("../models/Queue");
 const QueueEntry = require("../models/QueueEntry");
 
+// ================================
+// Call Next Student
+// ================================
 const callNextStudentService = async (queueId) => {
     // Check if queue exists
     const queue = await Queue.findById(queueId);
 
     if (!queue) {
         throw new Error("Queue not found");
+    }
+
+    // ==============================
+    // Business Rule #2
+    // Queue must be open
+    // ==============================
+    if (queue.status === "paused") {
+        throw new Error("Queue is paused. Cannot call next student.");
+    }
+
+    if (queue.status === "closed") {
+        throw new Error("Queue is closed. Cannot call next student.");
     }
 
     // Find the first waiting student
@@ -21,13 +36,13 @@ const callNextStudentService = async (queueId) => {
         throw new Error("No students waiting in queue");
     }
 
-    // Update status
+    // Update student status
     nextStudent.status = "serving";
     nextStudent.servedAt = new Date();
 
     await nextStudent.save();
 
-    // Update queue
+    // Update current token
     queue.currentToken = nextStudent.tokenNumber;
     await queue.save();
 
@@ -36,6 +51,10 @@ const callNextStudentService = async (queueId) => {
         student: nextStudent,
     };
 };
+
+// ================================
+// Complete Student Service
+// ================================
 const completeStudentService = async (queueId) => {
     // Check if queue exists
     const queue = await Queue.findById(queueId);
@@ -64,6 +83,9 @@ const completeStudentService = async (queueId) => {
     };
 };
 
+// ================================
+// Dashboard Statistics
+// ================================
 const getDashboardStatsService = async () => {
     const totalQueues = await Queue.countDocuments();
 
@@ -96,8 +118,10 @@ const getDashboardStatsService = async () => {
         cancelledStudents,
     };
 };
- 
+
+// ================================
 // Pause Queue
+// ================================
 const pauseQueueService = async (queueId) => {
     const queue = await Queue.findById(queueId);
 
@@ -119,7 +143,9 @@ const pauseQueueService = async (queueId) => {
     return queue;
 };
 
+// ================================
 // Resume Queue
+// ================================
 const resumeQueueService = async (queueId) => {
     const queue = await Queue.findById(queueId);
 
@@ -141,7 +167,9 @@ const resumeQueueService = async (queueId) => {
     return queue;
 };
 
+// ================================
 // Close Queue
+// ================================
 const closeQueueService = async (queueId) => {
     const queue = await Queue.findById(queueId);
 
