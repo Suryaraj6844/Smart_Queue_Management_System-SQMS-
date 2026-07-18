@@ -5,17 +5,13 @@ const QueueEntry = require("../models/QueueEntry");
 // Call Next Student
 // ================================
 const callNextStudentService = async (queueId) => {
-    // Check if queue exists
     const queue = await Queue.findById(queueId);
 
     if (!queue) {
         throw new Error("Queue not found");
     }
 
-    // ==============================
     // Business Rule #2
-    // Queue must be open
-    // ==============================
     if (queue.status === "paused") {
         throw new Error("Queue is paused. Cannot call next student.");
     }
@@ -24,7 +20,6 @@ const callNextStudentService = async (queueId) => {
         throw new Error("Queue is closed. Cannot call next student.");
     }
 
-    // Find the first waiting student
     const nextStudent = await QueueEntry.findOne({
         queue: queueId,
         status: "waiting",
@@ -36,13 +31,11 @@ const callNextStudentService = async (queueId) => {
         throw new Error("No students waiting in queue");
     }
 
-    // Update student status
     nextStudent.status = "serving";
     nextStudent.servedAt = new Date();
 
     await nextStudent.save();
 
-    // Update current token
     queue.currentToken = nextStudent.tokenNumber;
     await queue.save();
 
@@ -56,14 +49,21 @@ const callNextStudentService = async (queueId) => {
 // Complete Student Service
 // ================================
 const completeStudentService = async (queueId) => {
-    // Check if queue exists
     const queue = await Queue.findById(queueId);
 
     if (!queue) {
         throw new Error("Queue not found");
     }
 
-    // Find student currently being served
+    // Business Rule #3
+    if (queue.status === "paused") {
+        throw new Error("Queue is paused. Cannot complete service.");
+    }
+
+    if (queue.status === "closed") {
+        throw new Error("Queue is closed. Cannot complete service.");
+    }
+
     const currentStudent = await QueueEntry.findOne({
         queue: queueId,
         status: "serving",
@@ -73,7 +73,6 @@ const completeStudentService = async (queueId) => {
         throw new Error("No student is currently being served");
     }
 
-    // Mark service as completed
     currentStudent.status = "completed";
 
     await currentStudent.save();
