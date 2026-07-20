@@ -2,6 +2,8 @@ const {
     joinQueueService,
     getQueueStatusService,
     leaveQueueService,
+    getMyActiveQueuesService,
+    getQueueHistoryService,
 } = require("../services/queueEntryService");
 
 // Join Queue
@@ -68,8 +70,43 @@ const leaveQueue = async (req, res) => {
     }
 };
 
+// Get Current Active Queue
+// Get My Active Queues
+const getMyActiveQueues = async (req, res) => {
+    try {
+        const queues = await getMyActiveQueuesService(req.user._id);
+
+        return res.status(200).json({
+            success: true,
+            queues,
+        });
+    } catch (error) {
+        return res.status(404).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+// Get Queue History
+const getQueueHistory = async (req, res) => {
+    try {
+        const history = await getQueueHistoryService(req.user._id);
+
+        return res.status(200).json({
+            success: true,
+            history,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
 module.exports = {
     joinQueue,
     getQueueStatus,
+    getMyActiveQueues,
     leaveQueue,
+    getQueueHistory,
 };

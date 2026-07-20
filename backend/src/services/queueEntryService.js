@@ -178,8 +178,80 @@ const leaveQueueService = async (queueId, userId) => {
     };
 };
 
+const getMyActiveQueuesService = async (userId) => {
+    // Find all active queue entries of the user
+    const queueEntries = await QueueEntry.find({
+        user: userId,
+        status: {
+            $in: ["waiting", "serving"],
+        },
+    })
+        .populate("queue")
+        .sort({ joinedAt: 1 });
+
+    if (queueEntries.length === 0) {
+        throw new Error("No active queues found.");
+    }
+
+    const activeQueues = [];
+
+    for (const queueEntry of queueEntries) {
+        const queue = queueEntry.queue;
+
+        const peopleAhead = await QueueEntry.countDocuments({
+            queue: queue._id,
+            status: "waiting",
+            tokenNumber: {
+                $lt: queueEntry.tokenNumber,
+            },
+        });
+
+        const position = peopleAhead + 1;
+
+        const estimatedWaitingTime =
+            peopleAhead * queue.averageServiceTime;
+
+        activeQueues.push({
+            queueId: queue._id,
+            queueName: queue.queueName,
+            tokenNumber: queueEntry.tokenNumber,
+            status: queueEntry.status,
+            position,
+            peopleAhead,
+            estimatedWaitingTime,
+            currentToken: queue.currentToken,
+        });
+    }
+
+    return activeQueues;
+};
+
+const getQueueHistoryService = async (userId) => {
+    const history = await QueueEntry.find({
+        user: userId,
+        status: {
+            $in: ["completed", "cancelled"],
+        },
+    })
+        .populate("queue")
+        .sort({ joinedAt: -1 });
+
+    return history.map((entry) => ({
+        queueId: entry.queue._id,
+        queueName: entry.queue.queueName,
+        tokenNumber: entry.tokenNumber,
+        status: entry.status,
+        joinedAt: entry.joinedAt,
+        completedAt:
+            entry.completedAt ||
+            entry.cancelledAt,
+    }));
+};
+
 module.exports = {
     joinQueueService,
     getQueueStatusService,
+    getMyActiveQueuesService,
     leaveQueueService,
+    getQueueHistoryService,
 };

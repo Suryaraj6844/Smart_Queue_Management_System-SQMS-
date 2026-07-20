@@ -10,8 +10,9 @@ const {
 } = require("../controllers/queueController");
 
 // Protected Route
-router.post("/", protect, createQueue);
+const adminOnly = require("../middleware/adminMiddleware");
 
+router.post("/", protect, adminOnly, createQueue);
 
 router.get("/", protect, getAllQueues);
 

@@ -40,12 +40,17 @@ function Login() {
 
       console.log("Response:", data);
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("user", JSON.stringify(data.user));
+      console.log("Stored User:", data.user);
 
       toast.success("Login Successful");
 
-      navigate("/dashboard");
+      if (data.user?.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.error("LOGIN ERROR:", error);
 

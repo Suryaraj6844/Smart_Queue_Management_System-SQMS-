@@ -20,11 +20,12 @@ const registerUserService = async (userData) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Always create a student account through the public registration API.
     const user = await User.create({
         fullName,
         email,
         password: hashedPassword,
+        role: "student",
     });
 
     return {
