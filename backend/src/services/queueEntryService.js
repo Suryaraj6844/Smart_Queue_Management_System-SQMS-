@@ -1,5 +1,19 @@
 const Queue = require("../models/Queue");
 const QueueEntry = require("../models/QueueEntry");
+const Notification = require("../models/Notification");
+
+const createNotification = async (userId, type, message, queueId = null) => {
+    try {
+        await Notification.create({
+            user: userId,
+            type,
+            message,
+            queueId,
+        });
+    } catch (error) {
+        console.error("Notification creation failed", error);
+    }
+};
 
 const joinQueueService = async (queueId, userId) => {
     // Check if queue exists
@@ -53,6 +67,13 @@ const joinQueueService = async (queueId, userId) => {
         user: userId,
         tokenNumber: nextToken,
     });
+
+    await createNotification(
+        userId,
+        "queue_joined",
+        `You joined ${queue.queueName} successfully.`,
+        queue._id
+    );
 
     // Calculate position
     const position = await QueueEntry.countDocuments({
@@ -171,6 +192,13 @@ const leaveQueueService = async (queueId, userId) => {
 
     await queueEntry.save();
 
+    await createNotification(
+        userId,
+        "queue_cancelled",
+        `You cancelled your visit to ${queue.queueName}.`,
+        queue._id
+    );
+
     return {
         tokenNumber: queueEntry.tokenNumber,
         status: queueEntry.status,
@@ -242,10 +270,40 @@ const getQueueHistoryService = async (userId) => {
         tokenNumber: entry.tokenNumber,
         status: entry.status,
         joinedAt: entry.joinedAt,
-        completedAt:
-            entry.completedAt ||
-            entry.cancelledAt,
+        completedAt: entry.completedAt || entry.cancelledAt,
     }));
+};
+
+const getUserQueueStatsService = async (userId) => {
+    const totalVisits = await QueueEntry.countDocuments({ user: userId });
+    const completedVisits = await QueueEntry.countDocuments({
+        user: userId,
+        status: "completed",
+    });
+
+    return {
+        totalVisits,
+        completedVisits,
+    };
+};
+
+const getNotificationsService = async (userId) => {
+    const notifications = await Notification.find({ user: userId })
+        .sort({ createdAt: -1 })
+        .limit(20);
+
+    const unreadCount = await Notification.countDocuments({ user: userId, isRead: false });
+
+    return {
+        notifications,
+        unreadCount,
+    };
+};
+
+const markNotificationsAsReadService = async (userId) => {
+    await Notification.updateMany({ user: userId, isRead: false }, { isRead: true });
+
+    return { success: true };
 };
 
 module.exports = {
@@ -254,4 +312,7 @@ module.exports = {
     getMyActiveQueuesService,
     leaveQueueService,
     getQueueHistoryService,
+    getUserQueueStatsService,
+    getNotificationsService,
+    markNotificationsAsReadService,
 };

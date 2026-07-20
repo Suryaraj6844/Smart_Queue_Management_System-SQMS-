@@ -91,3 +91,46 @@ export const getQueueHistory = async () => {
 
   return response.data;
 };
+
+// Get student queue stats
+export const getUserQueueStats = async () => {
+  const token = sessionStorage.getItem("token");
+
+  const response = await API.get("/queues/stats", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+// Get user notifications
+export const getNotifications = async () => {
+  const token = sessionStorage.getItem("token");
+
+  const response = await API.get("/queues/notifications", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+// Mark notifications as read
+export const markNotificationsAsRead = async () => {
+  const token = sessionStorage.getItem("token");
+
+  const response = await API.patch(
+    "/queues/notifications/read",
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};

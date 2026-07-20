@@ -4,7 +4,7 @@ import {
   FaClipboardList,
 } from "react-icons/fa";
 
-function StatsCards({ activeQueues }) {
+function StatsCards({ activeQueues, completedVisits, totalVisits }) {
   const stats = [
     {
       title: "Active Queues",
@@ -15,14 +15,14 @@ function StatsCards({ activeQueues }) {
     },
     {
       title: "Completed",
-      value: 0,
+      value: completedVisits,
       icon: (
         <FaCheckCircle className="text-3xl text-green-600" />
       ),
     },
     {
       title: "Total Visits",
-      value: 0,
+      value: totalVisits,
       icon: (
         <FaClipboardList className="text-3xl text-purple-600" />
       ),

@@ -6,10 +6,11 @@ import StatsCards from "../../components/dashboard/StatsCards";
 import JoinQueue from "../../components/dashboard/JoinQueue";
 import MyActiveQueues from "../../components/dashboard/MyActiveQueues";
 
-import { getMyActiveQueues } from "../../services/queueService";
+import { getMyActiveQueues, getUserQueueStats } from "../../services/queueService";
 
 function UserDashboard() {
   const [activeQueues, setActiveQueues] = useState([]);
+  const [stats, setStats] = useState({ completedVisits: 0, totalVisits: 0 });
   const [loading, setLoading] = useState(true);
 
   const fetchActiveQueues = async () => {
@@ -21,17 +22,40 @@ function UserDashboard() {
       console.error(error);
 
       setActiveQueues([]);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const data = await getUserQueueStats();
+      setStats(data.stats || { completedVisits: 0, totalVisits: 0 });
+    } catch (error) {
+      console.error(error);
+      setStats({ completedVisits: 0, totalVisits: 0 });
     } finally {
       setLoading(false);
     }
   };
 
+  const refreshDashboard = async () => {
+    await Promise.all([fetchActiveQueues(), fetchStats()]);
+  };
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      void fetchActiveQueues();
+      void refreshDashboard();
     }, 0);
 
-    return () => window.clearTimeout(timer);
+    const handleQueueRefresh = () => {
+      void refreshDashboard();
+    };
+
+    window.addEventListener("queue-state-refresh", handleQueueRefresh);
+
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("queue-state-refresh", handleQueueRefresh);
+    };
   }, []);
 
   return (
@@ -54,16 +78,20 @@ function UserDashboard() {
             Manage your queues from here.
           </p>
 
-          <StatsCards activeQueues={activeQueues.length} />
+          <StatsCards
+            activeQueues={activeQueues.length}
+            completedVisits={stats.completedVisits}
+            totalVisits={stats.totalVisits}
+          />
           <div className="mt-8">
-            <JoinQueue onQueueJoined={fetchActiveQueues} />
+            <JoinQueue onQueueJoined={refreshDashboard} />
           </div>
 
           <div className="mt-8">
             <MyActiveQueues
               activeQueues={activeQueues}
               loading={loading}
-              refreshQueues={fetchActiveQueues}
+              refreshQueues={refreshDashboard}
             />
           </div>
         </main>

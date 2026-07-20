@@ -22,6 +22,8 @@ function MyActiveQueues({
       toast.success(response.message);
 
       await refreshQueues();
+      window.dispatchEvent(new Event("queue-state-refresh"));
+      window.dispatchEvent(new Event("queue-history-refresh"));
     } catch (error) {
       toast.error(
         error.response?.data?.message ||

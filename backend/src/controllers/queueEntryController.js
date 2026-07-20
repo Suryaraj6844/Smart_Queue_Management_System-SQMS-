@@ -4,6 +4,9 @@ const {
     leaveQueueService,
     getMyActiveQueuesService,
     getQueueHistoryService,
+    getUserQueueStatsService,
+    getNotificationsService,
+    markNotificationsAsReadService,
 } = require("../services/queueEntryService");
 
 // Join Queue
@@ -103,10 +106,62 @@ const getQueueHistory = async (req, res) => {
         });
     }
 };
+
+const getUserQueueStats = async (req, res) => {
+    try {
+        const stats = await getUserQueueStatsService(req.user._id);
+
+        return res.status(200).json({
+            success: true,
+            stats,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+const getNotifications = async (req, res) => {
+    try {
+        const result = await getNotificationsService(req.user._id);
+
+        return res.status(200).json({
+            success: true,
+            ...result,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+const markNotificationsAsRead = async (req, res) => {
+    try {
+        const result = await markNotificationsAsReadService(req.user._id);
+
+        return res.status(200).json({
+            success: true,
+            ...result,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     joinQueue,
     getQueueStatus,
     getMyActiveQueues,
     leaveQueue,
     getQueueHistory,
+    getUserQueueStats,
+    getNotifications,
+    markNotificationsAsRead,
 };

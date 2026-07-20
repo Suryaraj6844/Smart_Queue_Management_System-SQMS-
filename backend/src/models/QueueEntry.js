@@ -39,6 +39,11 @@ const queueEntrySchema = new mongoose.Schema(
             type: Date,
             default: null,
         },
+
+        completedAt: {
+            type: Date,
+            default: null,
+        },
     },
     {
         timestamps: true,

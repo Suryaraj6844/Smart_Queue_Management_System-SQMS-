@@ -49,6 +49,9 @@ function JoinQueue({ onQueueJoined }) {
       if (onQueueJoined) {
         await onQueueJoined();
       }
+
+      window.dispatchEvent(new Event("queue-state-refresh"));
+      window.dispatchEvent(new Event("queue-history-refresh"));
     } catch (error) {
       console.error(error);
 

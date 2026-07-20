@@ -26,7 +26,16 @@ function QueueHistory() {
       void fetchHistory();
     }, 0);
 
-    return () => window.clearTimeout(timer);
+    const handleHistoryRefresh = () => {
+      void fetchHistory();
+    };
+
+    window.addEventListener("queue-history-refresh", handleHistoryRefresh);
+
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("queue-history-refresh", handleHistoryRefresh);
+    };
   }, []);
 
   const formatDate = (date) => {

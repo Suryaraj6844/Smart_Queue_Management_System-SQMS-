@@ -9,7 +9,7 @@ const {
 
 const callNextStudent = async (req, res) => {
     try {
-        const result = await callNextStudentService(req.params.queueId);
+        const result = await callNextStudentService(req.params.queueId, req.user._id);
 
         res.status(200).json({
             success: true,
@@ -26,7 +26,7 @@ const callNextStudent = async (req, res) => {
 
 const completeStudent = async (req, res) => {
     try {
-        const result = await completeStudentService(req.params.queueId);
+        const result = await completeStudentService(req.params.queueId, req.user._id);
 
         res.status(200).json({
             success: true,

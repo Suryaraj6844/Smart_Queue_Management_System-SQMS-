@@ -10,6 +10,9 @@ const {
     leaveQueue,
     getMyActiveQueues,
     getQueueHistory,
+    getUserQueueStats,
+    getNotifications,
+    markNotificationsAsRead,
 } = require("../controllers/queueEntryController");
 // Join Queue
 router.post("/:queueId/join", protect, joinQueue);
@@ -18,6 +21,13 @@ router.post("/:queueId/join", protect, joinQueue);
 router.get("/my-active", protect, getMyActiveQueues);
 // Get Queue History
 router.get("/history", protect, getQueueHistory);
+
+// Get queue stats for the current user
+router.get("/stats", protect, getUserQueueStats);
+
+// Notifications
+router.get("/notifications", protect, getNotifications);
+router.patch("/notifications/read", protect, markNotificationsAsRead);
 
 // Get My Queue Status
 router.get("/:queueId/status", protect, getQueueStatus);

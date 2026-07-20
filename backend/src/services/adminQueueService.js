@@ -1,10 +1,24 @@
 const Queue = require("../models/Queue");
 const QueueEntry = require("../models/QueueEntry");
+const Notification = require("../models/Notification");
+
+const createAdminNotification = async (userId, type, message, queueId = null) => {
+    try {
+        await Notification.create({
+            user: userId,
+            type,
+            message,
+            queueId,
+        });
+    } catch (error) {
+        console.error("Admin notification creation failed", error);
+    }
+};
 
 // ================================
 // Call Next Student
 // ================================
-const callNextStudentService = async (queueId) => {
+const callNextStudentService = async (queueId, adminUserId = null) => {
     const queue = await Queue.findById(queueId);
 
     if (!queue) {
@@ -36,6 +50,24 @@ const callNextStudentService = async (queueId) => {
 
     await nextStudent.save();
 
+    if (nextStudent.user?._id) {
+        await createAdminNotification(
+            nextStudent.user._id,
+            "called_next",
+            `It is now your turn in ${queue.queueName}.`,
+            queue._id
+        );
+    }
+
+    if (adminUserId) {
+        await createAdminNotification(
+            adminUserId,
+            "called_next",
+            `You called the next student in ${queue.queueName}.`,
+            queue._id
+        );
+    }
+
     queue.currentToken = nextStudent.tokenNumber;
     await queue.save();
 
@@ -48,7 +80,7 @@ const callNextStudentService = async (queueId) => {
 // ================================
 // Complete Student Service
 // ================================
-const completeStudentService = async (queueId) => {
+const completeStudentService = async (queueId, adminUserId = null) => {
     const queue = await Queue.findById(queueId);
 
     if (!queue) {
@@ -74,8 +106,27 @@ const completeStudentService = async (queueId) => {
     }
 
     currentStudent.status = "completed";
+    currentStudent.completedAt = new Date();
 
     await currentStudent.save();
+
+    if (currentStudent.user?._id) {
+        await createAdminNotification(
+            currentStudent.user._id,
+            "service_completed",
+            `Your service in ${queue.queueName} has been completed.`,
+            queue._id
+        );
+    }
+
+    if (adminUserId) {
+        await createAdminNotification(
+            adminUserId,
+            "service_completed",
+            `You completed service for ${queue.queueName}.`,
+            queue._id
+        );
+    }
 
     return {
         completedStudent: currentStudent,
@@ -139,6 +190,22 @@ const pauseQueueService = async (queueId) => {
     queue.status = "paused";
     await queue.save();
 
+    const queueEntries = await QueueEntry.find({
+        queue: queueId,
+        status: { $in: ["waiting", "serving"] },
+    }).populate("user", "fullName email");
+
+    for (const entry of queueEntries) {
+        if (entry.user?._id) {
+            await createAdminNotification(
+                entry.user._id,
+                "queue_paused",
+                `${queue.queueName} has been paused.`,
+                queue._id
+            );
+        }
+    }
+
     return queue;
 };
 
@@ -162,6 +229,22 @@ const resumeQueueService = async (queueId) => {
 
     queue.status = "open";
     await queue.save();
+
+    const queueEntries = await QueueEntry.find({
+        queue: queueId,
+        status: { $in: ["waiting", "serving"] },
+    }).populate("user", "fullName email");
+
+    for (const entry of queueEntries) {
+        if (entry.user?._id) {
+            await createAdminNotification(
+                entry.user._id,
+                "queue_resumed",
+                `${queue.queueName} has been resumed.`,
+                queue._id
+            );
+        }
+    }
 
     return queue;
 };
