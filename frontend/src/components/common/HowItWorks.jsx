@@ -1,75 +1,34 @@
-import {
-  FaUserPlus,
-  FaTicketAlt,
-  FaChartLine,
-  FaBell,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaBell, FaChartLine, FaCheckCircle, FaTicketAlt, FaUserPlus } from "react-icons/fa";
 
 function HowItWorks() {
   const steps = [
-    {
-      icon: <FaUserPlus />,
-      title: "Register",
-      desc: "Create your account in seconds.",
-    },
-    {
-      icon: <FaTicketAlt />,
-      title: "Book Queue",
-      desc: "Choose a service and get your token.",
-    },
-    {
-      icon: <FaChartLine />,
-      title: "Track Status",
-      desc: "Watch your queue position live.",
-    },
-    {
-      icon: <FaBell />,
-      title: "Get Notification",
-      desc: "Receive alerts when your turn is near.",
-    },
-    {
-      icon: <FaCheckCircle />,
-      title: "Visit",
-      desc: "Arrive only when needed.",
-    },
+    { icon: <FaUserPlus />, title: "Register", desc: "Create your account in seconds and get ready to join." },
+    { icon: <FaTicketAlt />, title: "Book Queue", desc: "Select a service and receive your personal token instantly." },
+    { icon: <FaChartLine />, title: "Track Status", desc: "Follow live progress and see where you stand in line." },
+    { icon: <FaBell />, title: "Get Notification", desc: "Receive a timely reminder when your turn is close." },
+    { icon: <FaCheckCircle />, title: "Visit", desc: "Arrive with confidence and only when it is genuinely needed." },
   ];
 
   return (
-    <section className="py-20 bg-gray-100">
-      <div className="max-w-7xl mx-auto px-6">
-
-        <h2 className="text-4xl font-bold text-center">
-          How It Works
-        </h2>
-
-        <p className="text-center text-gray-600 mt-3 mb-14">
-          Using SQMS is simple and takes only a few steps.
-        </p>
-
-        <div className="grid md:grid-cols-5 gap-8">
-
-          {steps.map((step, index) => (
-            <div
-              key={index}
-              className="text-center"
-            >
-              <div className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl mx-auto">
-                {step.icon}
-              </div>
-
-              <h3 className="mt-5 text-xl font-semibold">
-                {step.title}
-              </h3>
-
-              <p className="mt-3 text-gray-600">
-                {step.desc}
-              </p>
-            </div>
-          ))}
-
+    <section className="px-4 py-20 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="max-w-2xl text-center mx-auto">
+          <p className="text-sm font-semibold uppercase tracking-[0.32em] text-cyan-600">How it works</p>
+          <h2 className="mt-4 text-3xl font-semibold text-slate-900 sm:text-4xl">A calm, clear flow from start to finish.</h2>
+          <p className="mt-4 text-lg text-slate-600">Using SQMS feels simple, friendly, and reassuring at every step.</p>
         </div>
 
+        <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+          {steps.map((step, index) => (
+            <div key={index} className="section-shell rounded-[24px] p-6 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-cyan-500 text-2xl text-white">
+                {step.icon}
+              </div>
+              <h3 className="mt-5 text-xl font-semibold text-slate-900">{step.title}</h3>
+              <p className="mt-3 text-slate-600">{step.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

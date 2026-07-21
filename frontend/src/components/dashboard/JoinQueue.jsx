@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
+import { FaArrowRight, FaClock } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-import {
-  getAllQueues,
-  joinQueue,
-} from "../../services/queueService";
+import { getAllQueues, joinQueue } from "../../services/queueService";
 
 function JoinQueue({ onQueueJoined }) {
   const [queues, setQueues] = useState([]);
@@ -15,8 +13,7 @@ function JoinQueue({ onQueueJoined }) {
     try {
       const data = await getAllQueues();
       setQueues((data.queues || []).filter((queue) => queue.status === "open"));
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Failed to load queues.");
     }
   };
@@ -37,13 +34,8 @@ function JoinQueue({ onQueueJoined }) {
 
     try {
       setJoining(true);
-
       const response = await joinQueue(selectedQueue);
-
-      console.log("Join Response:", response);
-
       toast.success("Successfully joined the queue!");
-
       setSelectedQueue("");
 
       if (onQueueJoined) {
@@ -52,57 +44,42 @@ function JoinQueue({ onQueueJoined }) {
 
       window.dispatchEvent(new Event("queue-state-refresh"));
       window.dispatchEvent(new Event("queue-history-refresh"));
+      console.log("Join Response:", response);
     } catch (error) {
-      console.error(error);
-
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to join queue."
-      );
+      toast.error(error.response?.data?.message || "Failed to join queue.");
     } finally {
       setJoining(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-2xl font-bold mb-6">
-        Join New Queue
-      </h2>
-
-      <div className="space-y-4">
+    <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-sm backdrop-blur">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 text-white">
+          <FaClock />
+        </div>
         <div>
-          <label className="block mb-2 font-medium">
-            Select Queue
-          </label>
+          <h2 className="text-2xl font-semibold text-slate-900">Join New Queue</h2>
+          <p className="text-sm text-slate-500">Select an open queue and secure your place.</p>
+        </div>
+      </div>
 
-          <select
-            value={selectedQueue}
-            onChange={(e) =>
-              setSelectedQueue(e.target.value)
-            }
-            disabled={joining}
-            className="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
+      <div className="mt-6 space-y-4">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">Select Queue</label>
+          <select value={selectedQueue} onChange={(e) => setSelectedQueue(e.target.value)} disabled={joining} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-700 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
             <option value="">Select a Queue</option>
-
             {queues.map((queue) => (
-              <option
-                key={queue._id}
-                value={queue._id}
-              >
+              <option key={queue._id} value={queue._id}>
                 {queue.queueName}
               </option>
             ))}
           </select>
         </div>
 
-        <button
-          onClick={handleJoinQueue}
-          disabled={joining}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-semibold transition"
-        >
+        <button onClick={handleJoinQueue} disabled={joining} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 font-semibold text-white transition hover:shadow-lg disabled:cursor-not-allowed disabled:from-indigo-400">
           {joining ? "Joining..." : "Join Queue"}
+          <FaArrowRight />
         </button>
       </div>
     </div>

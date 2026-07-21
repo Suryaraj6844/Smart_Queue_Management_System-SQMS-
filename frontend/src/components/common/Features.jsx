@@ -1,55 +1,39 @@
-import { FaClock, FaBell, FaMobileAlt } from "react-icons/fa";
+import { FaBell, FaClock, FaMobileAlt } from "react-icons/fa";
 
 function Features() {
   const features = [
     {
-      icon: <FaClock className="text-5xl text-blue-600" />,
+      icon: <FaClock className="text-5xl text-indigo-600" />,
       title: "Save Time",
-      description:
-        "Avoid standing in long queues by joining virtual queues from anywhere.",
+      description: "Join from anywhere and reduce wasted waiting time with a polished virtual queue experience.",
     },
     {
-      icon: <FaBell className="text-5xl text-blue-600" />,
+      icon: <FaBell className="text-5xl text-cyan-600" />,
       title: "Instant Notifications",
-      description:
-        "Receive alerts when your turn is approaching so you arrive at the right time.",
+      description: "Keep users informed with reliable updates when it is almost their turn.",
     },
     {
-      icon: <FaMobileAlt className="text-5xl text-blue-600" />,
+      icon: <FaMobileAlt className="text-5xl text-violet-600" />,
       title: "Access Anywhere",
-      description:
-        "Book, monitor, and manage your queue using any device with internet access.",
+      description: "Track status, manage entries, and stay in the loop from desktop or mobile.",
     },
   ];
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl font-bold text-center mb-4">
-          Why Choose SQMS?
-        </h2>
+    <section className="px-4 py-20 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.32em] text-indigo-600">Why teams choose SQMS</p>
+          <h2 className="mt-4 text-3xl font-semibold text-slate-900 sm:text-4xl">Designed for modern, high-trust service experiences.</h2>
+          <p className="mt-4 text-lg text-slate-600">Every interaction is intentional, calm, and effortless for both staff and customers.</p>
+        </div>
 
-        <p className="text-gray-600 text-center mb-14">
-          Everything you need for a smarter queue experience.
-        </p>
-
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
           {features.map((feature, index) => (
-            <div
-              key={index}
-              className="bg-gray-50 rounded-xl shadow-lg p-8 text-center hover:-translate-y-2 hover:shadow-2xl transition duration-300"
-            >
-              <div className="flex justify-center mb-6">
-                {feature.icon}
-              </div>
-
-              <h3 className="text-2xl font-semibold mb-4">
-                {feature.title}
-              </h3>
-
-              <p className="text-gray-600">
-                {feature.description}
-              </p>
+            <div key={index} className="section-shell rounded-[24px] p-8 transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50">{feature.icon}</div>
+              <h3 className="mt-6 text-2xl font-semibold text-slate-900">{feature.title}</h3>
+              <p className="mt-3 text-slate-600">{feature.description}</p>
             </div>
           ))}
         </div>

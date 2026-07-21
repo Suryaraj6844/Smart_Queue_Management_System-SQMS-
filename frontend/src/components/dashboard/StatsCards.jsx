@@ -1,52 +1,23 @@
-import {
-  FaUsers,
-  FaCheckCircle,
-  FaClipboardList,
-} from "react-icons/fa";
+import { FaCheckCircle, FaClipboardList, FaUsers } from "react-icons/fa";
 
 function StatsCards({ activeQueues, completedVisits, totalVisits }) {
   const stats = [
-    {
-      title: "Active Queues",
-      value: activeQueues,
-      icon: (
-        <FaUsers className="text-3xl text-blue-600" />
-      ),
-    },
-    {
-      title: "Completed",
-      value: completedVisits,
-      icon: (
-        <FaCheckCircle className="text-3xl text-green-600" />
-      ),
-    },
-    {
-      title: "Total Visits",
-      value: totalVisits,
-      icon: (
-        <FaClipboardList className="text-3xl text-purple-600" />
-      ),
-    },
+    { title: "Active Queues", value: activeQueues, icon: <FaUsers className="text-3xl text-indigo-600" />, accent: "from-indigo-500/10 to-indigo-600/5" },
+    { title: "Completed", value: completedVisits, icon: <FaCheckCircle className="text-3xl text-emerald-600" />, accent: "from-emerald-500/10 to-emerald-600/5" },
+    { title: "Total Visits", value: totalVisits, icon: <FaClipboardList className="text-3xl text-violet-600" />, accent: "from-violet-500/10 to-violet-600/5" },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+    <div className="mt-8 grid gap-6 md:grid-cols-3">
       {stats.map((item) => (
-        <div
-          key={item.title}
-          className="bg-white rounded-xl shadow-md p-6 flex justify-between items-center"
-        >
-          <div>
-            <p className="text-gray-500">
-              {item.title}
-            </p>
-
-            <h2 className="text-3xl font-bold mt-2">
-              {item.value}
-            </h2>
+        <div key={item.title} className={`rounded-[24px] border border-slate-200 bg-gradient-to-br ${item.accent} p-6 shadow-sm`}>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-slate-500">{item.title}</p>
+              <h2 className="mt-2 text-3xl font-semibold text-slate-900">{item.value}</h2>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-3 shadow-sm">{item.icon}</div>
           </div>
-
-          {item.icon}
         </div>
       ))}
     </div>
